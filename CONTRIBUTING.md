@@ -132,6 +132,24 @@ pnpm dev
 - Run `pnpm format` before committing
 - Run `pnpm lint:fix` to fix linting issues
 
+### Frontend Architecture Boundaries
+
+The frontend enforces a strict layering rule: **UI components and pages must not call backend or auth endpoints directly.** All backend access must flow through the designated layers:
+
+```
+UI component / page
+  └─ hook or view-model (e.g. useSignIn)
+       └─ application service (e.g. AuthApplicationService)
+            └─ API client or server gateway (e.g. authApi, requireCurrentUser)
+                 └─ fetch / HTTP call
+```
+
+**Allowed locations for `fetch`:** `apps/frontend/lib/api/**`, `apps/frontend/src/server/**`, and `apps/frontend/app/api/**` (the entire Next.js API routes directory is excluded from the rule).
+
+**Blocked locations:** files matching `apps/frontend/app/**/!(route).{ts,tsx}` (i.e. any `.ts`/`.tsx` under `app/**` whose filename is not `route` — `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, etc. are blocked; `route.ts`/`route.tsx` are exempt everywhere under `app/**`; and the entire `app/api/**` directory is excluded from the rule), `apps/frontend/components/**`, and `apps/frontend/src/hooks/**`. Note: test files inside blocked directories are also subject to the rule.
+
+This rule is enforced automatically by ESLint (`no-restricted-syntax` in the root `eslint.config.js`) and by the `Lint` CI workflow. A violation will fail the pre-commit hook and block the PR.
+
 ### Commit Messages
 
 We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
