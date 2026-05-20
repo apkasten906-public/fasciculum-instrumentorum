@@ -3,6 +3,18 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
+  "containerEnv": {
+    "PORT": "3101",
+    "WEBSOCKET_PORT": "3101",
+    "CORS_ORIGIN": "http://localhost:3100",
+    "WEBSOCKET_CORS_ORIGIN": "http://localhost:3100",
+    "ALLOWED_ORIGINS": "http://localhost:3100",
+    "NEXTAUTH_URL": "http://localhost:3100",
+    "NEXT_PUBLIC_API_URL": "http://localhost:3101",
+    "NEXT_PUBLIC_WEBSOCKET_URL": "http://localhost:3101",
+    "E2E_BASE_URL": "http://localhost:3100",
+    "E2E_BACKEND_URL": "http://localhost:3101"
+  },
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "25",
@@ -58,13 +70,13 @@
     }
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
-  "forwardPorts": [3000, 3001, 5432, 6379],
+  "forwardPorts": [3100, 3101, 5432, 6379],
   "portsAttributes": {
-    "3000": {
+    "3100": {
       "label": "Frontend (Next.js)",
       "onAutoForward": "notify"
     },
-    "3001": {
+    "3101": {
       "label": "Backend (Express)",
       "onAutoForward": "notify"
     },

@@ -168,7 +168,7 @@ describe('WebSocketService', () => {
 
     // Set test environment variables
     process.env['WEBSOCKET_PORT'] = testPort.toString();
-    process.env['WEBSOCKET_CORS_ORIGIN'] = 'http://localhost:3000';
+    process.env['WEBSOCKET_CORS_ORIGIN'] = 'http://localhost:3100';
 
     // Create WebSocket service
     websocketService = new WebSocketService(loggerService);

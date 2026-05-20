@@ -27,9 +27,9 @@ function warn(line: string): Promise<void> {
 async function globalSetup(): Promise<void> {
   await info('🚀 Starting E2E test setup...');
 
-  const frontendBaseUrl = process.env['E2E_BASE_URL'] || 'http://localhost:3000';
+  const frontendBaseUrl = process.env['E2E_BASE_URL'] || 'http://localhost:3100';
   const backendBaseUrl =
-    process.env['E2E_BACKEND_URL'] || process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3001';
+    process.env['E2E_BACKEND_URL'] || process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3101';
   const seedToken = process.env['E2E_SEED_TOKEN'] || 'local-e2e-seed-token';
 
   process.env['E2E_BASE_URL'] = frontendBaseUrl;

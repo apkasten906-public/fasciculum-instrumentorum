@@ -270,7 +270,7 @@ export class App {
    * Start server
    */
   public async start(): Promise<void> {
-    const port = process.env['PORT'] || 3001;
+    const port = process.env['PORT'] || 3101;
 
     try {
       // Connect to database

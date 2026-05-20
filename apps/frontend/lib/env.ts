@@ -11,6 +11,6 @@
  */
 export function resolveApiBaseUrl(): string {
   return (
-    process.env['API_URL_INTERNAL'] || process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3001'
+    process.env['API_URL_INTERNAL'] || process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3101'
   );
 }

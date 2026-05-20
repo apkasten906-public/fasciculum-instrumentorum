@@ -53,7 +53,7 @@ export const securityHeaders = helmet({
  * CORS configuration middleware
  */
 export const corsConfig = (req: Request, res: Response, next: NextFunction): void => {
-  const allowedOrigins = process.env['ALLOWED_ORIGINS']?.split(',') || ['http://localhost:3000'];
+  const allowedOrigins = process.env['ALLOWED_ORIGINS']?.split(',') || ['http://localhost:3100'];
 
   const origin = req.headers['origin'];
   if (origin && allowedOrigins.includes(origin)) {

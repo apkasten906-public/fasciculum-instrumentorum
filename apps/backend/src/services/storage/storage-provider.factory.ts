@@ -16,7 +16,7 @@ import { S3StorageProvider } from './providers/s3-storage.provider';
  *
  * Local Storage:
  * - STORAGE_PATH: Base path for local storage (default: ./uploads)
- * - STORAGE_BASE_URL: Base URL for accessing files (default: http://localhost:3001/uploads)
+ * - STORAGE_BASE_URL: Base URL for accessing files (default: http://localhost:3101/uploads)
  *
  * AWS S3:
  * - AWS_REGION: AWS region (default: us-east-1)

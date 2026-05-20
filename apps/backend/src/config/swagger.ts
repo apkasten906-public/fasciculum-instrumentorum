@@ -19,7 +19,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3001/api',
+      url: 'http://localhost:3101/api',
       description: 'Development server',
     },
     {

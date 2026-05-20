@@ -61,10 +61,10 @@ export class WebSocketService {
 
   constructor(private logger: LoggerService) {
     this.config = {
-      port: parseInt(process.env['WEBSOCKET_PORT'] || '3001', 10),
+      port: parseInt(process.env['WEBSOCKET_PORT'] || '3101', 10),
       path: process.env['WEBSOCKET_PATH'] || '/socket.io',
       cors: {
-        origin: process.env['WEBSOCKET_CORS_ORIGIN']?.split(',') || ['http://localhost:3000'],
+        origin: process.env['WEBSOCKET_CORS_ORIGIN']?.split(',') || ['http://localhost:3100'],
         credentials: true,
       },
       pingTimeout: parseInt(process.env['WEBSOCKET_PING_TIMEOUT'] || '60000', 10),

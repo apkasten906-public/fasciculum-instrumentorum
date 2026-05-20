@@ -5,8 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
 // set `REUSE_EXISTING_SERVER=true` in the environment that launches the tests.
 // By default we reuse the server locally (non-CI).
 
-const backendUrl = 'http://localhost:3001/health';
-const frontendUrl = 'http://localhost:3000';
+const backendUrl = 'http://localhost:3101/health';
+const frontendUrl = 'http://localhost:3100';
 
 // Default to reusing already-running local servers (e.g. Docker) to avoid
 // “url already used” errors in VS Code Test Explorer.
@@ -85,7 +85,7 @@ export default defineConfig({
         DATABASE_URL:
           process.env['DATABASE_URL'] ||
           'postgresql://devuser:devpassword@localhost:5432/nextnode_dev',
-        NEXT_PUBLIC_API_URL: process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3001',
+        NEXT_PUBLIC_API_URL: process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3101',
       },
     },
   ],

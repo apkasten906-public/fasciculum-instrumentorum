@@ -126,11 +126,11 @@ COPY --from=builder --chown=nodejs:nodejs /app/apps/frontend/features ./apps/fro
 USER nodejs
 
 # Expose port
-EXPOSE 3001
+EXPOSE 3101
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+    CMD node -e "require('http').get('http://localhost:3101/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start application
 WORKDIR /app/apps/backend

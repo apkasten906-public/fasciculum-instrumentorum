@@ -103,7 +103,7 @@ export interface UseWebSocketReturn {
  */
 export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketReturn {
   const {
-    url = process.env['NEXT_PUBLIC_WEBSOCKET_URL'] || 'http://localhost:3001',
+    url = process.env['NEXT_PUBLIC_WEBSOCKET_URL'] || 'http://localhost:3101',
     path = '/socket.io',
     autoConnect = true,
     reconnection = true,

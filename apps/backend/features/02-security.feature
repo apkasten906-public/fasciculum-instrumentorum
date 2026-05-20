@@ -145,7 +145,7 @@ Feature: Security Framework
 
     Examples:
       | origin                    | result   |
-      | http://localhost:3000     | allowed  |
+      | http://localhost:3100     | allowed  |
       | https://trusted-domain.com| allowed  |
       | https://malicious.com     | blocked  |
 

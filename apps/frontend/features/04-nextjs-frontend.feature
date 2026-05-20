@@ -5,8 +5,8 @@ Feature: Next.js Frontend Application
   So that we can interact with the backend services
 
   Background:
-    Given the Next.js application is running on port 3000
-    And the backend API is running on port 3001
+    Given the Next.js application is running on port 3100
+    And the backend API is running on port 3101
 
   @frontend @nextjs @app-router
   Scenario: Next.js App Router architecture

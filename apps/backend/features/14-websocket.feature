@@ -5,7 +5,7 @@ Feature: WebSocket Real-Time Communication
   So that users can receive instant updates and collaborate in real-time
 
   Background:
-    Given WebSocket server is initialized on port 3001
+    Given WebSocket server is initialized on port 3101
     And Redis adapter is configured for scaling
     And authentication middleware is active
 

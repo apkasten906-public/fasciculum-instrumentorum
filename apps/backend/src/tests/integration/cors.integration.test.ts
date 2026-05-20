@@ -8,13 +8,13 @@ describe('CORS configuration', () => {
     const app = express();
     app.use(
       cors({
-        origin: ['http://localhost:3000', 'https://trusted-domain.com'],
+        origin: ['http://localhost:3100', 'https://trusted-domain.com'],
       })
     );
 
     app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
-    const allowed = await request(app).get('/api/health').set('Origin', 'http://localhost:3000');
+    const allowed = await request(app).get('/api/health').set('Origin', 'http://localhost:3100');
     expect(allowed.headers['access-control-allow-origin']).toBeDefined();
 
     const trusted = await request(app)

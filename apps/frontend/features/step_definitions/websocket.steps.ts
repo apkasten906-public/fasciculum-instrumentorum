@@ -31,7 +31,7 @@ Then('it should default to NEXT_PUBLIC_WEBSOCKET_URL', async function (this: Wor
 
   assert.ok(
     content.includes("process.env['NEXT_PUBLIC_WEBSOCKET_URL']") &&
-      content.includes("|| 'http://localhost:3001'"),
+      content.includes("|| 'http://localhost:3101'"),
     'Expected default url to use NEXT_PUBLIC_WEBSOCKET_URL with localhost fallback'
   );
 });

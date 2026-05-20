@@ -1,5 +1,8 @@
 FROM node:25-bookworm
 
+ENV PNPM_HOME=/usr/local/share/pnpm
+ENV PATH=${PNPM_HOME}:${PATH}
+
 # Install additional tools
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
@@ -13,7 +16,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
-RUN npm install -g pnpm@8.15.0
+RUN mkdir -p "${PNPM_HOME}" && npm install -g pnpm@8.15.1
 
 # Install common global packages
 RUN pnpm add -g \

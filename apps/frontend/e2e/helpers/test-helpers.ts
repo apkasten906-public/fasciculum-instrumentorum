@@ -68,7 +68,7 @@ export class AuthHelpers {
     const user = TestData.getValidUser();
     const effectiveEmail = email ?? user.email;
     const effectivePassword = password ?? user.password;
-    const baseUrl = process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3001';
+    const baseUrl = process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3101';
 
     // Call backend login endpoint to receive HttpOnly cookies
     const response = await page.request.post(`${baseUrl}/api/auth/login`, {

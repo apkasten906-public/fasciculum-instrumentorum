@@ -28,7 +28,7 @@ export class LocalStorageProvider implements IStorageProvider {
 
   constructor(private readonly logger: LoggerService) {
     this.basePath = process.env['STORAGE_PATH'] || path.join(process.cwd(), 'uploads');
-    this.baseUrl = process.env['STORAGE_BASE_URL'] || 'http://localhost:3001/uploads';
+    this.baseUrl = process.env['STORAGE_BASE_URL'] || 'http://localhost:3101/uploads';
   }
 
   private async ensureBaseDirectory(): Promise<void> {
