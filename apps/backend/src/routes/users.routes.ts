@@ -61,7 +61,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     const audit = container.resolve<AuditLogService>('AuditLogService');
 
     const userId = req.user?.userId;
-    const { id } = req.params;
+    const id = req.params['id'] as string;
 
     if (!userId) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -125,7 +125,7 @@ router.patch('/:id', async (req: Request, res: Response): Promise<void> => {
     const audit = container.resolve<AuditLogService>('AuditLogService');
 
     const userId = req.user?.userId;
-    const { id } = req.params;
+    const id = req.params['id'] as string;
     const { name, image } = req.body;
 
     if (!userId) {
@@ -188,7 +188,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
     const audit = container.resolve<AuditLogService>('AuditLogService');
 
     const userId = req.user?.userId;
-    const { id } = req.params;
+    const id = req.params['id'] as string;
 
     if (!userId) {
       res.status(401).json({ error: 'Unauthorized' });

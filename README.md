@@ -1,290 +1,111 @@
-# Next.js + Node.js Monorepo Base Template
+# Fasciculum Instrumentorum
 
-```bash
-# Seed the database
-pnpm prisma db seed
+Fasciculum Instrumentorum is an application monorepo built from the Next.js + Node.js base template. The project keeps the template's useful development foundation while using this repository as the home for the Fasciculum Instrumentorum app.
 
-# Start the development servers
-cd ../..
-pnpm dev
-```
+## Stack
 
 - Monorepo: Turborepo with pnpm workspaces
-- Frontend: Next.js (App Router) + TypeScript + Tailwind CSS
-- Backend: Express + TypeScript + Prisma
-- Docker: Docker Compose + multi-stage Dockerfiles
-- BDD: Cucumber features + status/implementation governance tooling + dashboard
-- Tests: Vitest (backend + frontend unit) and Playwright (E2E)
-- Observability: Correlation IDs for request tracing (`X-Correlation-ID`)
+- Frontend: Next.js App Router, TypeScript, Tailwind CSS
+- Backend: Express, TypeScript, Prisma
+- Data services: PostgreSQL and Redis through Docker Compose
+- Testing: Vitest, Playwright, and Cucumber BDD features
+- Tooling: ESLint, Prettier, Husky, ADR utilities, and BDD status scripts
 
-## Scaffolded / Planned
+## Prerequisites
 
-- Contract tests (Pact)
-- Security testing (OWASP ZAP)
-- Load testing (k6)
-- Additional deployment/observability building blocks (Kubernetes/Istio manifests and docs)
+- Node.js 25+
+- pnpm 8+
+- Docker and Docker Compose
+- VS Code with Dev Containers, if you use the container workflow
+
+## Package Manager
+
+This repository uses pnpm. The pinned version is declared in `package.json`:
+
+```bash
+pnpm --version
+pnpm install
+```
+
+The devcontainer bootstrap installs pnpm automatically when it is missing, then runs `pnpm install`.
 
 ## Quick Start
 
-### Prerequisites
+### Dev Container
 
-- Node.js 25+ (for native TypeScript support - see [ADR-001](docs/adr/001-node-js-25-native-typescript.md))
-- pnpm 8+
-- Docker & Docker Compose
-- VSCode (recommended for Dev Containers)
-
-### Option 1: Dev Container (Recommended)
-
-1. Install [VSCode](https://code.visualstudio.com/) and [Docker](https://www.docker.com/)
-2. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-3. Clone the repository
-4. Open in VSCode and click "Reopen in Container"
-5. Wait for the container to build and dependencies to install
-6. Start developing
-
-### Option 2: Local Setup
+1. Open the repository in VS Code.
+2. Choose **Reopen in Container**.
+3. Wait for the post-create setup to install dependencies.
+4. Start development:
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd next-node-app-base
-
-# Install dependencies
-pnpm install
-
-## Set up environment variables
-
-This repo uses separate env files depending on how you run it:
-
-- Docker Compose env (used by `docker compose`): copy `.env.docker.example` → `.env`
-- Backend local dev env (loaded from `apps/backend/.env`): copy `apps/backend/.env.example` → `apps/backend/.env`
-- Frontend local dev env (loaded by Next.js): copy `apps/frontend/.env.local.example` → `apps/frontend/.env.local`
-
-Monorepo note: prefer scoping commands to an app/package when working with env vars (e.g. `pnpm --filter backend dev`, `pnpm --filter frontend dev`, `pnpm --filter frontend test:e2e`).
-
-# Start development services (PostgreSQL, Redis, etc.)
-docker compose up -d
-
-# Run database migrations
-cd apps/backend
-pnpm prisma migrate dev
-
-# Seed the database
-pnpm prisma db seed
-
-# Start the development servers
-cd ../..
 pnpm dev
 ```
 
-Note: By default, Postgres/Redis are not published to localhost ports (to avoid conflicts with existing local services). See `docs/DOCKER.md` for how to expose ports via an override file if you need host access.
-
-## Project Structure
-
-````text
-next-node-app-base/
-├── .devcontainer/          # Dev Container configuration
-```bash
-# Development
-pnpm dev                    # Start all apps in development mode
-pnpm dev:frontend           # Start only frontend
-pnpm dev:backend            # Start only backend
-
-# Building
-pnpm build                  # Build all apps
-pnpm build:frontend         # Build frontend
-pnpm build:backend          # Build backend
-
-# Testing
-
-## First-Time Setup
-
-Install Playwright browsers (required for E2E tests):
+### Local Development
 
 ```bash
-# Windows
-.\scripts\setup-playwright.ps1
-
-# Linux/Mac
-./scripts/setup-playwright.sh
-
-# Or manually
-pnpm playwright install
-````
-
-## Building
-
-pnpm build # Build all apps
-pnpm build:frontend # Build frontend
-pnpm build:backend # Build backend
-
-## Testing
-
-### First-Time Setup
-
-Install Playwright browsers (required for E2E tests):
-
-```bash
-# Windows
-.\scripts\setup-playwright.ps1
-
-# Linux/Mac
-./scripts/setup-playwright.sh
-
-# Or manually
-pnpm playwright install
+pnpm install
+docker compose up -d postgres redis
+pnpm db:migrate
+pnpm dev
 ```
 
-### Running Tests
+The local development servers use:
 
-**Important for E2E tests:** Playwright automatically starts both frontend and backend servers before running tests. No manual server startup required!
+- Frontend: <http://localhost:3100>
+- Backend: <http://localhost:3101/health>
 
-```bash
-pnpm test                   # Run all tests
-pnpm test:unit              # Run unit tests
-pnpm test:integration       # Run integration tests
-pnpm test:e2e               # Run E2E tests (automatically starts servers)
-pnpm test:e2e:ui            # Run E2E tests in interactive UI mode
-pnpm test:e2e:debug         # Run E2E tests in debug mode
-pnpm test:contract          # Run contract tests
-pnpm test:security          # Run security tests
-pnpm test:load              # Run load tests (requires k6 + scenarios; scaffolded)
-```
+## Environment Files
 
-**E2E Test Details:**
+Use separate env files for local app development and Docker Compose:
 
-- Runs across multiple browser projects (Chromium, Firefox, WebKit, mobile emulation)
-- Servers auto-start: Backend (port 3001) + Frontend (port 3000)
-- Tests wait for servers to be ready before executing
-- Servers auto-shutdown after tests complete
+- Docker Compose: copy `.env.docker.example` to `.env`
+- Backend local dev: copy `apps/backend/.env.example` to `apps/backend/.env`
+- Frontend local dev: copy `apps/frontend/.env.local.example` to `apps/frontend/.env.local`
 
-**E2E / Playwright env vars (optional):**
-
-- `E2E_SEED_TOKEN`: token sent as `x-e2e-seed-token` to `POST /api/e2e/seed` (default: `local-e2e-seed-token`)
-- `E2E_BACKEND_URL`: override backend base URL for E2E setup (default: `http://localhost:3001`)
-- `E2E_BASE_URL`: override frontend base URL for E2E setup (default: `http://localhost:3000`)
-- `REUSE_EXISTING_SERVER`: controls Playwright `webServer.reuseExistingServer` (`true`/`false`); by default it reuses locally and does not reuse in CI unless explicitly set
-
-See [TEST_EXPLORER_GUIDE.md](docs/TEST_EXPLORER_GUIDE.md) for VSCode Test Explorer setup.
-
-### Code Quality
+When working with app-specific env vars, prefer scoped commands such as:
 
 ```bash
-pnpm lint # Lint all code
-pnpm lint:fix # Fix linting issues
-pnpm lint:workflows # Lint GitHub Actions workflows (actionlint)
-pnpm format # Format code with Prettier
-pnpm typecheck # Run TypeScript type checking
+pnpm --filter backend dev
+pnpm --filter frontend dev
+pnpm --filter frontend test:e2e
 ```
 
-### Database
+## Common Commands
 
 ```bash
-pnpm db:migrate # Run database migrations
-pnpm db:seed # Seed database
-pnpm db:studio # Open Prisma Studio
-pnpm db:reset # Reset database#
+pnpm dev
+pnpm dev:frontend
+pnpm dev:backend
+pnpm build
+pnpm test
+pnpm test:e2e
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm bdd:status
 ```
 
-### Git hooks
+## Project Layout
 
-This repository uses Husky hooks to enforce linting, commit message rules, and a fast test gate before pushing.
+```text
+apps/
+  backend/     Express API, Prisma schema, backend tests, backend BDD features
+  frontend/    Next.js app, frontend tests, frontend BDD features
+packages/
+  types/       Shared TypeScript types
+  constants/   Shared constants
+  config/      Shared configuration package
+  utils/       Shared utilities
+docs/          Architecture, testing, Docker, BDD, and operations docs
+scripts/       Repo automation scripts
+```
 
-- `pre-commit`: runs `lint-staged` (Prettier + ESLint) and a quick TypeScript check on `apps/backend`.
-- `commit-msg`: runs `commitlint` to enforce conventional commit messages.
-- `pre-push`: runs a quick mocked backend test run via `scripts/run-backend-tests-ci.js` which sets `TEST_EXTERNAL_SERVICES=false` and `REDIS_MOCK=true`.
+## More Documentation
 
-If a hook fails, fix the issues locally and re-run the commands. CI runs the same checks and will block merges if they fail.
-
-## Security
-
-This project follows OWASP security standards and best practices:
-
-- **Governance**: OWASP-oriented security governance docs and standards
-- **Security Headers**: Helmet.js baseline middleware
-- **Authorization**: RBAC/ABAC services and middleware
-- **Encryption**: Encryption/hashing services for secrets and credentials
-- Planned/scaffolded: Istio mTLS integration, dependency scanning, OWASP ZAP DAST
-
-See [SECURITY.md](SECURITY.md) for vulnerability reporting.
-
-## Documentation
-
-Docs live in `docs/` (plus some app-specific docs under `apps/*/docs/`). Start here:
-
-- `docs/BDD.md`
-- `docs/BDD_IMPLEMENTATION_AUDIT.md`
-- `docs/CORRELATION_ID.md`
-- `docs/DOCKER.md`
-- `docs/TESTING.md`
-- `docs/TEST_EXPLORER_GUIDE.md`
-- `docs/WEBSOCKET.md`
-- `docs/security-governance.md`
-- ADRs: `docs/adr/`
-
-## Internationalization
-
-The application supports multiple languages:
-
-- English (en) - Default
-- Spanish (es)
-- French (fr)
-- German (de)
-
-Translations live under `apps/frontend/public/locales/` and i18n configuration is in `apps/frontend/i18n.ts`.
-
-## Deployment
-
-### Deployment Strategies
-
-Kubernetes/Istio deployment content is included as scaffolding and examples (for example, see the Verdaccio manifests).
-
-- **Blue-Green**: Zero-downtime deployments with instant rollback
-- **Canary**: Gradual traffic shifting (5% → 25% → 50% → 100%)
-- **A/B Testing**: User segment-based routing
-
-See:
-
-- `docs/DOCKER.md` for local Docker workflows
-- `kubernetes/verdaccio/README.md` for a Kubernetes + Istio example
-
-### Environments
-
-- **Development**: Local development with Docker Compose
-- **Staging**: Kubernetes cluster with Istio (pre-production)
-- **Production**: Kubernetes cluster with Istio (high availability)
-
-## Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
-
-- Code of Conduct
-- Development workflow
-- Pull request process
-- Coding standards
-- Commit message conventions
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-Built with amazing open-source technologies:
-
-- [Next.js](https://nextjs.org/)
-- [Express](https://expressjs.com/)
-- [Prisma](https://www.prisma.io/)
-- [Turborepo](https://turbo.build/)
-- [Istio](https://istio.io/)
-- [Kubernetes](https://kubernetes.io/)
-- And many more...
-
-## Support
-
-- 📧 Email: [support@example.com](mailto:support@example.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/your-org/next-node-app-base/issues)
-
----
-
-**⭐ If this template helps you, please give it a star!**
+- [Setup](SETUP.md)
+- [Docker](docs/DOCKER.md)
+- [Testing](docs/TESTING.md)
+- [BDD](docs/BDD.md)
+- [Architecture Decisions](docs/adr/README.md)

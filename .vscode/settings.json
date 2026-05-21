@@ -1,4 +1,10 @@
 {
+  // Force UI-only extensions to run on the local VS Code host, not inside the
+  // devcontainer. This ensures OAuth / browser-based sign-in flows work
+  // correctly and prevents blocking calls from stalling the remote extension host.
+  "remote.extensionKind": {
+    "openai.chatgpt": ["ui"]
+  },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
@@ -36,7 +42,10 @@
     "**/.next": true,
     "**/.turbo": true,
     "**/coverage": true,
-    "**/.tools": true
+    "**/.tools": true,
+    "**/pnpm-lock.yaml": true,
+    "**/package-lock.json": true,
+    "**/yarn.lock": true
   },
   "files.exclude": {
     "**/.tools": true
@@ -47,7 +56,10 @@
     "**/build/**": true,
     "**/.next/**": true,
     "**/.turbo/**": true,
-    "**/.tools/**": true
+    "**/.tools/**": true,
+    "**/pnpm-lock.yaml": true,
+    "**/package-lock.json": true,
+    "**/yarn.lock": true
   },
   "playwright.reuseBrowser": true,
   "playwright.showBrowser": true,
@@ -62,7 +74,12 @@
     ".github/actions/**/action.yaml": "yaml",
 
     "**/.tools/istio/**/manifests/charts/**/templates/*.yml": "plaintext",
-    "**/.tools/istio/**/manifests/charts/**/templates/*.yaml": "plaintext"
+    "**/.tools/istio/**/manifests/charts/**/templates/*.yaml": "plaintext",
+
+    // Treat lock files as plaintext so YAML / JSON language servers skip them
+    "**/pnpm-lock.yaml": "plaintext",
+    "**/package-lock.json": "plaintext",
+    "**/yarn.lock": "plaintext"
   },
   "json.schemaDownload.enable": false,
   "yaml.useSchemaFromModeline": true,

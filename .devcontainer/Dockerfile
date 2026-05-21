@@ -9,6 +9,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     git \
     curl \
     wget \
+    sudo \
     vim \
     nano \
     postgresql-client \
@@ -16,7 +17,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm
-RUN mkdir -p "${PNPM_HOME}" && npm install -g pnpm@8.15.1
+RUN mkdir -p "${PNPM_HOME}" && npm install -g pnpm@8.15.0
 
 # Install common global packages
 RUN pnpm add -g \
@@ -28,16 +29,19 @@ RUN pnpm add -g \
 # Set up working directory
 WORKDIR /workspace
 
-# Configure git
-RUN git config --global --add safe.directory /workspace
-
 # Create non-root user
 ARG USERNAME=node
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+RUN echo "${USERNAME} ALL=(root) NOPASSWD:ALL" > "/etc/sudoers.d/${USERNAME}" \
+    && chmod 0440 "/etc/sudoers.d/${USERNAME}"
+
 # Switch to non-root user
 USER $USERNAME
+
+# Configure git safe directory for the non-root user
+RUN git config --global --add safe.directory /workspace
 
 # Set default shell
 SHELL ["/bin/bash", "-c"]

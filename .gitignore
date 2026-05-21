@@ -103,3 +103,6 @@ temp/
 # Sentry
 .sentryclirc
 .github/pr_templates/
+
+# Devcontainer personal config (git identity, local secrets)
+.devcontainer/.env

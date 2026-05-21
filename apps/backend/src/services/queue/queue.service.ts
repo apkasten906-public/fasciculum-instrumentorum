@@ -44,7 +44,7 @@ export class QueueService implements IQueueService {
     if (!this.queues.has(name)) {
       const queue = new Queue(name, {
         connection: this.connection,
-        defaultJobOptions: defaultJobOptions || {
+        defaultJobOptions: (defaultJobOptions || {
           attempts: 3,
           backoff: {
             type: 'exponential',
@@ -57,7 +57,7 @@ export class QueueService implements IQueueService {
           removeOnFail: {
             count: 500, // Keep last 500 failed jobs
           },
-        },
+        }) as JobsOptions,
       });
 
       this.queues.set(name, queue);

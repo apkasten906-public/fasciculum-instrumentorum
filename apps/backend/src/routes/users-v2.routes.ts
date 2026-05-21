@@ -189,7 +189,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const user = await db.user.findUnique({
-      where: { id: req.params['id'] },
+      where: { id: req.params['id'] as string },
       select: {
         id: true,
         email: true,

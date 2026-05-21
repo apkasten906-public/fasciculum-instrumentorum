@@ -303,7 +303,7 @@ router.post(
  */
 router.get('/file/:filename', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
-    const filePath = req.params['filename'] || '';
+    const filePath = (req.params['filename'] as string) || '';
     const shouldDownload = req.query['download'] === 'true';
 
     const storageService = container.resolve(StorageService);
@@ -361,7 +361,7 @@ router.delete(
   authenticate,
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const filePath = req.params['filename'] || '';
+      const filePath = (req.params['filename'] as string) || '';
       const storageService = container.resolve(StorageService);
 
       const success = await storageService.delete(filePath);
