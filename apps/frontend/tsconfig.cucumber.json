@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node"
+  },
+  "include": ["features/**/*.ts", "src/**/*.ts", "src/**/*.tsx", "i18n.ts", "next-env.d.ts"]
+}

@@ -1,184 +1,221 @@
-# Project Start / Planning Prompt — High-Value Instrument Marketplace MVP
+# Project Start / Planning Prompt — High-Value Instrument and Bow Marketplace MVP
 
 ## Project context
 
-We are building a prototype for a web platform that supports the buying and selling of high-value musical instruments. The initial focus is on string instruments, especially violins, violas, cellos, and later bows.
+We are building a one-week prototype for a web platform that supports buying and selling high-value string instruments and bows.
 
-The platform must not be a simple classifieds site. The core thesis is:
+The platform is not a generic classifieds site. The central product thesis is:
 
-> High-value instruments do not need another simple listing page. They need a structured, trustworthy listing profile that creates qualified buyer inquiries.
+> High-value string instruments and bows do not need another simple listing page. They need structured, trustworthy listing profiles that are qualified before publication and generate qualified buyer inquiries.
 
-The prototype should be demonstrable within one week. It must intentionally avoid real payments, escrow, legally binding transactions, and production-grade appraisal workflows in the first MVP.
+The first prototype must be demonstrable next week. It should be pragmatic, visually convincing, and implementation-ready inside the existing Next/Node Base App bootstrap.
 
-## Project language decision
+## Project language
 
-The working language for this project is **English**.
+All project documentation, implementation notes, stories, acceptance criteria, issue descriptions, commit guidance, and coordination prompts must be written in English.
 
-All planning documents, stories, prompts, technical notes, issue descriptions, acceptance criteria, domain language, and implementation guidance should be written in English unless explicitly requested otherwise.
+The product UI must support English and German in the MVP.
 
-The product itself must support multiple user interface languages, but the project documentation and development coordination language is English.
+## Internationalization from day 1
 
-## Critical architectural decision: internationalization from day 1
+Internationalization is a foundation, not later UI polish.
 
-The platform must be internationalizable from the first MVP. Multilingual support is not a later UI polish task. It is a core architecture decision.
-
-The MVP starts with:
+MVP locales:
 
 ```text
-Primary MVP locales:
-- English: en
-- German: de
+en
+de
 ```
 
-The architecture should allow later expansion without major rework to additional target languages, such as:
+The architecture should later support additional target languages without major rework, for example:
 
 ```text
-Possible later target locales:
-- French: fr
-- Spanish: es
-- Portuguese: pt
-- Italian: it
-- Mandarin / Simplified Chinese: zh
-- Japanese: ja
-- Korean: ko
-- Russian: ru
+fr
+es
+pt
+it
+zh
+ja
+ko
+ru
 ```
 
-Italian should be considered early because of its strong relevance to historical string instruments, violin making, provenance, and specialist terminology.
+Italian should be considered important for future domain expansion because of its relevance to historical string instruments, violin making, provenance, and specialist vocabulary.
 
-### Internationalization principles
+### I18n implementation principles
 
 - Do not hard-code visible UI text in components.
-- Navigation text, buttons, labels, validation messages, status messages, trust signals, form hints, and empty states must use locale files or the existing i18n mechanism.
-- The MVP must be demonstrable in at least English and German.
-- Prefer locale-prefixed routes such as `/en/...` and `/de/...`.
-- Include a simple language switcher.
-- Prepare locale-aware formatting for dates, numbers, and currencies.
-- Store domain values as stable internal codes and localize their display labels.
-- Seller-generated free text does not need automatic translation in the MVP, but the data model should support later translations.
-- English should be treated as the canonical language for developer-facing keys, documentation, and issue/story writing.
+- Navigation labels, buttons, form labels, validation errors, status messages, trust signals, domain labels, and helper text must use locale files or the existing i18n mechanism.
+- Use locale-aware routes such as `/en/...` and `/de/...`.
+- Provide a simple language switcher.
+- Store stable internal domain codes and localize display labels.
+- Format prices, dates, and numbers in a locale-aware way.
+- Seller-generated free text does not need automatic translation in the one-week prototype, but the data model should not block later translation support.
 
-### Product consequence
+## Core MVP listing scope
 
-The prototype should show that the platform is designed for an international high-value instrument market:
+The MVP supports listings for high-value string instruments and bows.
+
+Initial listing item types:
 
 ```text
-/en/marketplace
-→ English marketplace
-
-/de/marketplace
-→ German marketplace
+violin
+viola
+cello
+bow
 ```
 
-A German-speaking seller may create an instrument listing. An English-speaking buyer should still understand the structured data, trust signals, and inquiry flow in English. Free-text seller descriptions may remain in the original language for the MVP if the UI and taxonomic terms are localized.
+Bows are first-class listing items, not accessories. The product, data model, filters, seed data, localized labels, trust panels, and inquiry flow must treat bows as part of the core marketplace scope.
 
-## Strategic starting point
+Use `listingItemType` as the stable internal domain concept. Avoid `instrumentType` as the primary concept if it would exclude bows.
 
-Existing comparison and inspiration sources:
+Deferred listing item types:
 
-- Tarisio: auction house, private sales, expertise, provenance, instrument database, trust.
-- McNeela Music: e-commerce shop, clear product categories, retail UX.
-- Blue Danube Violins: local specialist shop / workshop, consulting, consignment, trust through reputation.
-- Facebook Marketplace: current informal workaround with reach and simplicity, but weak specialist structure and weak trust signals.
+```text
+double_bass
+cases
+accessories
+sheet_music
+services
+```
 
-The prototype should combine the simplicity of a marketplace, the specialist knowledge of a violin dealer, and the trust model of an auction house.
+## Strategic reference models
+
+Use these existing market examples as input archetypes, not as direct copies:
+
+- Tarisio: auction house, private sales, expertise, provenance, instrument data, trust.
+- McNeela Music: e-commerce shop, clear categories, retail UX.
+- Blue Danube Violins: local specialist dealer/workshop, consultation, commission sales, reputation.
+- Facebook Marketplace: current informal workaround with reach and simplicity, but weak specialist structure and weak trust.
+
+The prototype should communicate the product direction clearly:
+
+> The simplicity of a marketplace, the specialist structure of a violin dealer, and the trust orientation of an expert auction house.
 
 ## Selected MVP value stream
 
 The first value stream to prototype is:
 
 ```text
-Seller/dealer brings an instrument onto the platform
-→ Platform structures and qualifies the listing
-→ Buyer can understand why the listing is trustworthy
-→ Buyer submits a qualified inquiry
+Seller/dealer creates a listing for an instrument or bow
+-> Platform structures and qualifies the listing
+-> Admin publishes or requests changes
+-> Buyer can understand why the listing is trustworthy
+-> Buyer submits a qualified inquiry
+-> Seller and admin can see the inquiry
 ```
 
-Out of scope for the first MVP:
+The seller/admin qualification loop must be built before or alongside the public buyer marketplace. Do not build a buyer-facing marketplace first and retrofit trust later.
 
-- Payment processing
-- Escrow
-- Shipping insurance
-- Auctions
-- Legally binding purchase contracts
-- Full expert appraisal workflows
-- Complex price valuation
-- Live chat
-- Automatic professional translation of all seller-generated free text
+## One-week prototype success path
 
-## Prototype goal
+The prototype must demonstrate this path:
 
-The prototype should demonstrate:
+```text
+Seller creates listing
+-> Seller submits listing for review
+-> Admin publishes or requests changes
+-> Seller can see requested changes
+-> Buyer views localized trust panel
+-> Buyer submits qualified inquiry with one required primary intent
+-> Seller/admin sees inquiry
+```
 
-1. A seller or dealer creates an instrument listing.
-2. The platform guides the seller through structured entry of instrument details, condition, photos, certificates, and provenance.
-3. The listing receives a documentation and trust status.
-4. Buyers see not just a listing, but a structured trust overview.
-5. Buyers submit a qualified inquiry.
-6. Sellers or platform operators see the inquiry in a dashboard.
-7. Users can switch between English and German without breaking the platform logic.
+## Explicit non-goals for the one-week MVP
 
-## Technical frame
+Do not implement:
 
-The project will be bootstrapped in the existing Next/Node Base App.
+```text
+real payment
+escrow
+real document verification
+automatic price valuation
+auctions
+shipping or insurance logic
+legally binding purchase workflow
+map UI
+geolocation search
+dealer map pins
+appointment scheduling
+multi-intent buyer inquiries
+automatic professional translation of seller free text
+```
 
-Work pragmatically and prototype-first. Use existing authentication, roles, database, and API layers if they are already available and not blocking progress. If they slow down the prototype, use seed data, mock APIs, or lightweight persistence.
+## Future vision: dealer and workshop discovery while traveling
 
-Prefer:
+The long-term platform vision includes helping musicians discover trusted dealers and workshops wherever they are traveling. This may later become a map-based experience similar to travel booking platforms, where dealers and workshops are listed geographically and shown as pins on a map.
 
-- Next.js UI for buyer, seller, and admin flows.
-- Node/API layer for listings, seller profiles, trust signals, and inquiries.
-- Seed data for 8–12 high-value example instruments.
-- Simple role logic: Buyer, Seller, Admin.
-- If needed, a demo role switcher instead of full authentication.
-- Clear, self-documenting names.
-- TypeScript with explicit return types if this is the project standard.
-- BDD-style acceptance criteria as implementation guidance.
-- Internationalization from the first vertical slice.
-- Use the base app's existing i18n standard if available; otherwise introduce a lightweight Next-compatible locale file structure for the prototype.
+This is not part of the one-week prototype. The MVP may show seller city and country only. Do not implement map UI, geolocation search, latitude/longitude fields, map pins, or appointment scheduling.
+
+## Price handling
+
+The MVP supports both stated asking prices and price-on-request listings.
+
+Stable internal fields:
+
+```text
+priceMode: asking_price | price_on_request
+priceAmount: number | null
+priceCurrency: EUR | USD | GBP | ...
+```
+
+Rules:
+
+- If `priceMode` is `asking_price`, `priceAmount` is required.
+- If `priceMode` is `price_on_request`, `priceAmount` is null.
+- Public UI displays price-on-request listings with localized text.
+- Numeric price filters apply only to listings with `priceMode = asking_price`.
+- Price-on-request listings are excluded from numeric price-range results unless a separate include option is later added.
+- The documentation score may recognize that a price state is provided, but should not imply that every high-value listing must publish an exact amount.
 
 ## MVP pages
 
-Routes should be locale-aware. The exact implementation can follow the base app's routing conventions, but the logical routes should support locale prefixes.
+Routes should be locale-aware. Logical route list:
 
 ```text
 /[locale]/marketplace
-→ Public instrument catalogue
+-> public marketplace showing published listings only
 
 /[locale]/marketplace/[listingId]
-→ Instrument detail page with trust panel and inquiry form
+-> listing detail page with trust panel and inquiry form
 
 /[locale]/seller/listings
-→ Seller sees their own instruments
+-> seller sees own listings and their lifecycle status
 
 /[locale]/seller/listings/new
-→ Create-instrument wizard
+-> seller creates a listing for a string instrument or bow
 
 /[locale]/seller/inquiries
-→ Seller sees buyer inquiries
+-> seller sees buyer inquiries for own listings
 
 /[locale]/admin/review
-→ Platform reviews submitted listings
+-> admin reviews submitted listings
 
 /[locale]/admin/review/[listingId]
-→ Review detail page with checklist, score, and status change
+-> review detail with checklist, documentation score, publish action, and request-changes action
+
+/[locale]/admin/inquiries
+-> simple internal view of all buyer inquiries
 ```
 
-## Minimal domain models
+## Minimal domain model guidance
+
+Use these concepts pragmatically. Persist them if the base app is ready; otherwise mock or seed them cleanly.
 
 ```text
 SellerProfile
 - id
 - displayName
-- sellerType: dealer | workshop | private | institution
-- location
+- sellerType: dealer | workshop | private_seller | institution
+- city
+- country
 - verifiedStatus: unverified | pending | verified
 - description
 
-InstrumentListing
+Listing
 - id
 - sellerId
-- instrumentType: violin | viola | cello | bow
+- listingItemType: violin | viola | cello | bow
 - title
 - makerName
 - attributedTo
@@ -186,17 +223,19 @@ InstrumentListing
 - originCity
 - yearLabel
 - yearApproximation
+- priceMode: asking_price | price_on_request
 - priceAmount
 - priceCurrency
 - conditionSummary
 - provenanceSummary
-- status: draft | submitted | reviewed | published
+- status: draft | submitted | changes_requested | published
+- reviewNote
 - documentationScore
 - sourceLocale: en | de | fr | es | pt | it | zh | ja | ko | ru
 - createdAt
 - updatedAt
 
-InstrumentListingTranslation
+ListingTranslation
 - id
 - listingId
 - locale
@@ -206,7 +245,7 @@ InstrumentListingTranslation
 - publicDescription
 - translationStatus: source | draft | reviewed | machine_translated | human_reviewed
 
-InstrumentPhoto
+ListingPhoto
 - id
 - listingId
 - url
@@ -214,7 +253,7 @@ InstrumentPhoto
 - captionLocale
 - sortOrder
 
-InstrumentDocument
+ListingDocument
 - id
 - listingId
 - documentType: certificate | appraisal | provenance | repair_history | dendrochronology | other
@@ -230,145 +269,83 @@ BuyerInquiry
 - buyerName
 - buyerEmail
 - buyerType: professional_musician | student | collector | dealer | parent | institution | other
-- intent: viewing | trial | price_question | certificate_question | purchase_interest | other
+- primaryIntent: viewing | trial | price_question | certificate_question | purchase_interest | other
 - preferredLocale: en | de | fr | es | pt | it | zh | ja | ko | ru
 - budgetRange
 - message
+- consentToShareWithSeller
 - status: new | contacted | closed
 - createdAt
 ```
 
-`TrustSignal` may either be stored or calculated from listing, document, and seller data. Trust signal labels should not be stored as free text. Use stable codes and localize their display labels.
+Trust signals may be stored or calculated. Prefer stable trust signal codes and localized display labels.
 
 Example:
 
 ```text
 trustSignalCode: certificate_present
-/en display: Certificate available
-/de display: Zertifikat vorhanden
+English: Certificate available
+German: Zertifikat vorhanden
 ```
 
-## Documentation and trust logic
+## Lifecycle-aware seed data
 
-The prototype should show a trust panel, for example:
+Seed data must support the full trust flow, not only the public marketplace.
+
+Include at least:
 
 ```text
-This instrument is 82% documented
-✓ Seller profile complete
-✓ Certificate available
-✓ 8 photos available
-✓ Condition description available
-⚠ Provenance only partially documented
-⚠ No independent price appraisal recorded
+- one draft listing
+- one submitted listing
+- one changes_requested listing
+- several published listings
+- listings for violin, viola, cello, and bow
+- at least one price_on_request listing
+- at least one strongly documented listing
+- at least one partially documented listing
 ```
 
-German display example:
+Public marketplace pages must show only `published` listings.
+
+## Implementation order
+
+Use this order so the build does not drift into a generic buyer marketplace:
 
 ```text
-Dieses Instrument ist zu 82 % dokumentiert
-✓ Verkäuferprofil vollständig
-✓ Zertifikat vorhanden
-✓ 8 Fotos vorhanden
-✓ Zustandsbeschreibung vorhanden
-⚠ Provenienz nur teilweise dokumentiert
-⚠ Keine unabhängige Preisbewertung hinterlegt
+1. Locale routing and translation mechanism
+2. Domain types, price model, and lifecycle-aware seed data
+3. Seller create-listing flow
+4. Seller submit for review
+5. Admin review with publish and request-changes states
+6. Seller requested-changes visibility
+7. Public marketplace showing published listings only
+8. Listing detail page with localized trust panel
+9. Buyer inquiry form with one required primary intent and consent-to-share checkbox
+10. Seller and admin inquiry views
+11. Filters and UI polish if time allows
+12. Demo role switcher if needed
 ```
 
-Example trust signals:
+## Development style
 
-- Seller profile complete
-- Seller verified
-- Certificate available
-- Appraisal available
-- Provenance documented
-- Repair history available
-- Multiple high-quality photos available
-- Condition description available
-- Viewing available
-- Trial possible
-- Asking price stated
+- Prefer simple vertical slices over speculative infrastructure.
+- Keep names readable and self-documenting.
+- Use explicit TypeScript return types where project standards require them.
+- Keep visible text externalized from the start.
+- Keep BDD acceptance criteria visible and use them to guide implementation.
+- If full auth slows the demo down, use a demo role switcher.
+- Do not overbuild future map/discovery functionality.
 
-## Demo storyline
+## Branching guidance
 
-Do not start the demo technically. Start with the market problem:
+- Epic 0 implementation may begin.
+- At minimum, each epic must have its own feature branch.
+- Recommended default: use one feature branch per story to keep work atomic, reviewable, and reversible.
+- Exception: if multiple stories are tightly coupled and cannot be demonstrated, reviewed, or merged independently without creating churn, they may share the epic branch or a shared feature branch.
+- Prefer smaller story branches merged into the epic branch over long-running mixed-scope branches.
 
-```text
-Today, high-value instruments often move through informal networks or even Facebook Marketplace. That is simple, but weak on trust, documentation, and qualified inquiries.
+## Demo success criterion
 
-This prototype shows how a high-value instrument can be not merely listed, but structured, documented, and presented with trust signals.
+The prototype is successful if viewers understand this within ten minutes:
 
-It also shows from day 1 that high-value instruments are traded internationally: the same structured data, trust signals, and buyer inquiries work in English and German.
-```
-
-Demo flow:
-
-1. A seller creates a violin listing in German.
-2. The seller adds photos, certificate information, condition, and provenance.
-3. The platform calculates documentation level and trust signals.
-4. The admin sees submitted listings and can set review status.
-5. A buyer opens the marketplace in English.
-6. The buyer sees localized UI, localized trust signals, and structured data.
-7. The buyer understands why the listing is trustworthy.
-8. The buyer submits a qualified inquiry in English.
-9. The seller or admin sees the lead in the dashboard.
-
-## Priorities
-
-### Must-have
-
-- Locale structure for English and German
-- No hard-coded UI copy in new MVP components
-- English/German language switcher
-- Catalogue with example instruments
-- Instrument detail page
-- Lightweight seller profile
-- Create-instrument wizard
-- Documentation / trust checklist
-- Documentation score
-- Buyer inquiry form
-- Seller/Admin inquiry dashboard
-
-### Should-have
-
-- Filters by instrument type, price, origin, and documentation level
-- Listing status: Draft, Submitted, Reviewed, Published
-- Seed data for 8–12 example instruments
-- Demo role switcher: Buyer, Seller, Admin
-- Localized labels for instrument types, seller types, document types, buyer intents, and status values
-- Locale-aware price, date, and number formatting
-
-### Could-have
-
-- Watchlist
-- Comparison view
-- Email mock for inquiries
-- Document upload mock
-- Polished badge components
-- First translation structure for seller-generated free text
-- Admin warning when an English translation is missing
-
-### Won't-have in the prototype
-
-- Payment
-- Escrow
-- Shipping insurance
-- Auction logic
-- Live chat
-- Legally binding purchase completion
-- Real expert verification
-- Automatic professional translation of all content
-- Full support for more than English and German
-
-## Expected working style
-
-Work in small vertical slices. Each story should combine UI, API/data model, and acceptance criteria where possible.
-
-Prioritize demonstrable value over technical completeness.
-
-Keep the code clean, but avoid overengineering.
-
-Use seed data when real integrations would slow down the prototype.
-
-Internationalization must not be treated as final polish. Every visible MVP component should work directly in English and German.
-
-Document clearly what is demo functionality and what must later be productionized.
+> This platform is not Facebook Marketplace for violins. It makes high-value string instruments and bows easier to sell and evaluate by structuring listings, qualifying them before publication, presenting localized trust signals, and capturing qualified buyer inquiries.

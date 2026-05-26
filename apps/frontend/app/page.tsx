@@ -1,5 +1,6 @@
-import { HomeClient } from '@/components/home-client';
+import { redirect } from 'next/navigation';
+import type { JSX } from 'react';
 
 export default async function HomePage(): Promise<JSX.Element> {
-  return <HomeClient isAuthenticated={false} />;
+  redirect('/en/marketplace');
 }

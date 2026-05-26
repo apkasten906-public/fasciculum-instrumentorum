@@ -65,6 +65,14 @@
   "playwright.showBrowser": true,
   "playwright.showTrace": false,
   "testing.automaticallyOpenPeekView": "never",
+  "cucumber.features": [
+    "apps/frontend/features/**/*.feature",
+    "apps/backend/features/**/*.feature"
+  ],
+  "cucumber.glue": ["apps/frontend/features/**/*.ts", "apps/backend/features/**/*.ts"],
+  "cucumberTestExtension.workingDirectory": "${workspaceFolder}/apps/frontend",
+  "cucumberTestExtension.rootDirectory": "${workspaceFolder}/apps/frontend",
+  "cucumberTestExtension.profile": "default",
   "playwright.env": {
     "REUSE_EXISTING_SERVER": "true"
   },

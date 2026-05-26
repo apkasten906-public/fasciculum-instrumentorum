@@ -6,6 +6,12 @@ services:
     volumes:
       - ..:/workspace:cached
       - node_modules:/workspace/node_modules
+      - backend_node_modules:/workspace/apps/backend/node_modules
+      - frontend_node_modules:/workspace/apps/frontend/node_modules
+      - package_config_node_modules:/workspace/packages/config/node_modules
+      - package_constants_node_modules:/workspace/packages/constants/node_modules
+      - package_types_node_modules:/workspace/packages/types/node_modules
+      - package_utils_node_modules:/workspace/packages/utils/node_modules
     command: sleep infinity
     networks:
       - devnet
@@ -46,3 +52,9 @@ volumes:
   postgres-data:
   redis-data:
   node_modules:
+  backend_node_modules:
+  frontend_node_modules:
+  package_config_node_modules:
+  package_constants_node_modules:
+  package_types_node_modules:
+  package_utils_node_modules:

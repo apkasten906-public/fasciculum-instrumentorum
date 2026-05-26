@@ -9,6 +9,4 @@ Feature: Internationalization (i18n)
     Then default locale should be "en"
     And supported locales should include:
       | en |
-      | es |
-      | fr |
       | de |

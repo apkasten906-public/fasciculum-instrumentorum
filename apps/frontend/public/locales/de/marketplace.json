@@ -1,0 +1,27 @@
+{
+  "eyebrow": "Qualifizierter Marktplatz",
+  "title": "Marktplatz fuer hochwertige Instrumente und Boegen",
+  "description": "Strukturierte Angebote, Vertrauenssignale und qualifizierte Anfragen fuer hochwertige Streichinstrumente.",
+  "navigation": {
+    "marketplace": "Marktplatz",
+    "sell": "Verkaufen",
+    "inquiries": "Anfragen"
+  },
+  "actions": {
+    "browseListings": "Angebote ansehen",
+    "sellInstrument": "Instrument verkaufen"
+  },
+  "form": {
+    "title": "Uebersicht zur Angebotserfassung",
+    "sellerTypeLabel": "Verkaeufertyp",
+    "priceModeLabel": "Preismodell",
+    "submitLabel": "Entwurf speichern"
+  },
+  "status": {
+    "reviewReady": "Pruefbereites Angebot"
+  },
+  "values": {
+    "sellerType": "Haendler",
+    "priceMode": "Festpreis"
+  }
+}

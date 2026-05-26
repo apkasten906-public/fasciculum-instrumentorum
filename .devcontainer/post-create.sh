@@ -27,7 +27,7 @@ fi
 # Ensure git treats /workspace as safe regardless of ownership
 git config --global --add safe.directory /workspace
 
-PNPM_VERSION="${PNPM_VERSION:-8.15.0}"
+PNPM_VERSION="${PNPM_VERSION:-10.23.0}"
 
 if ! command -v pnpm >/dev/null 2>&1; then
     echo "Installing pnpm ${PNPM_VERSION}..."
@@ -36,19 +36,28 @@ fi
 
 echo "Using pnpm $(pnpm --version)"
 
-if [ -d "node_modules" ] && [ ! -w "node_modules" ]; then
-    echo "node_modules is not writable by $(whoami); repairing workspace install directory..."
-    if command -v sudo >/dev/null 2>&1; then
-        sudo chown -R "$(id -u):$(id -g)" node_modules
-    else
-        mv node_modules "node_modules.root-owned.$(date +%s)"
-        mkdir -p node_modules
+mapfile -t NODE_MODULE_DIRS < <(find . -type d -name node_modules 2>/dev/null)
+
+for dir in "${NODE_MODULE_DIRS[@]}"; do
+    if [ ! -w "$dir" ]; then
+        echo "$dir is not writable by $(whoami); repairing ownership..."
+        if command -v sudo >/dev/null 2>&1; then
+            sudo chown -R "$(id -u):$(id -g)" "$dir"
+        else
+            mv "$dir" "${dir}.root-owned.$(date +%s)"
+            mkdir -p "$dir"
+        fi
     fi
-fi
+done
 
 # Install dependencies
 echo "Installing dependencies..."
 pnpm install
+
+# Prisma client generation is required for backend startup and can be skipped
+# when dependency build scripts are gated by pnpm's approve-builds flow.
+echo "Generating Prisma client..."
+pnpm --filter backend run db:generate
 
 # Set up git hooks
 echo "Setting up Git hooks..."

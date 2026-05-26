@@ -9,6 +9,7 @@
   },
   "packageManager": "pnpm@10.23.0",
   "scripts": {
+    "preinstall": "node scripts/check-runtime.js",
     "dev": "turbo run dev",
     "dev:frontend": "turbo run dev --filter=frontend",
     "dev:backend": "turbo run dev --filter=backend",

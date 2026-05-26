@@ -1,0 +1,27 @@
+{
+  "eyebrow": "Qualified Marketplace",
+  "title": "Marketplace for fine instruments and bows",
+  "description": "Structured listings, trust signals, and qualified inquiries for high-value string instruments.",
+  "navigation": {
+    "marketplace": "Marketplace",
+    "sell": "Sell",
+    "inquiries": "Inquiries"
+  },
+  "actions": {
+    "browseListings": "Browse listings",
+    "sellInstrument": "Sell an instrument"
+  },
+  "form": {
+    "title": "Listing intake snapshot",
+    "sellerTypeLabel": "Seller type",
+    "priceModeLabel": "Price mode",
+    "submitLabel": "Save draft"
+  },
+  "status": {
+    "reviewReady": "Review-ready listing"
+  },
+  "values": {
+    "sellerType": "Dealer",
+    "priceMode": "Asking price"
+  }
+}

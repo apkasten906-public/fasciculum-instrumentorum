@@ -1,3 +1,5 @@
+process.env.TS_NODE_PROJECT = './tsconfig.cucumber.json';
+
 const common = {
   require: ['features/support/**/*.ts', 'features/step_definitions/**/*.ts'],
   requireModule: ['ts-node/register'],

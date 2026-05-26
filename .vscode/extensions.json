@@ -10,6 +10,8 @@
     "ms-vscode.vscode-typescript-next",
     "vitest.explorer",
     "ms-playwright.playwright",
+    "aristotelos.cucumber-test-extension",
+    "cucumberopen.cucumber-official",
     "usernamehw.errorlens",
     "christian-kohler.path-intellisense",
     "christian-kohler.npm-intellisense",

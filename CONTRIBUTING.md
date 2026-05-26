@@ -79,7 +79,7 @@ Review guidance for CI/workflow changes: `docs/Planning/WORKFLOW_CHANGE_REVIEW_P
 Our CI workflows are expected to match the repository toolchain declared in the root `package.json`:
 
 - Node: follow `engines.node` (currently `>=25.0.0`)
-- pnpm: follow `packageManager` (currently `pnpm@8.15.0`)
+- pnpm: follow `packageManager` (currently `pnpm@10.23.0`)
 
 When updating `.github/workflows/*.yml`, keep these in sync to avoid “works locally, fails in CI” drift.
 
@@ -98,6 +98,9 @@ When updating `.github/workflows/*.yml`, keep these in sync to avoid “works lo
 ```bash
 # Clone your fork
 git clone https://github.com/YOUR_USERNAME/next-node-app-base.git
+
+# Use the repository Node version before installing
+nvm use
 cd next-node-app-base
 
 # Install dependencies

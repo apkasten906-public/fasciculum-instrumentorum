@@ -1,33 +1,153 @@
-# MVP Stories — High-Value Instrument Marketplace Prototype
+# MVP Stories — High-Value Instrument and Bow Marketplace Prototype
 
 ## Product thesis
 
-This prototype is not a generic marketplace. It is a trust-centered lead generation prototype for high-value string instruments.
+This prototype is not a generic marketplace. It is a trust-centered lead generation prototype for high-value string instruments and bows.
+
+For the MVP, the platform trust claim is:
+
+```text
+The platform actively structures and qualifies listings before publication.
+```
 
 Selected MVP value stream:
 
 ```text
-Seller/dealer brings an instrument onto the platform
-→ Platform structures and qualifies the listing
-→ Buyer can understand why the listing is trustworthy
-→ Buyer submits a qualified inquiry
+Seller/dealer creates a listing for an instrument or bow
+-> Platform structures and qualifies the listing
+-> Buyer can understand why the listing is trustworthy
+-> Buyer submits a qualified inquiry
+-> Seller and admin can see the inquiry
 ```
 
 ## Project language
 
-All stories, acceptance criteria, implementation notes, and issue descriptions are written in English. The product UI must support English and German in the MVP.
+All stories, acceptance criteria, implementation notes, issue descriptions, and project documentation are written in English. The product UI must support English and German in the MVP.
+
+## One-week prototype success path
+
+```text
+Seller creates listing
+-> Seller submits listing for review
+-> Admin publishes or requests changes
+-> Seller can see requested changes
+-> Buyer views localized trust panel
+-> Buyer submits qualified inquiry
+-> Seller/admin sees inquiry
+```
+
+## Core listing scope
+
+The MVP supports high-value string instruments and bows.
+
+Initial listing item types:
+
+```text
+violin
+viola
+cello
+bow
+```
+
+Bows are first-class listing items, not accessories. The product, data model, filters, seed data, localized labels, and buyer inquiry flow must treat bows as part of the core marketplace scope.
+
+Use `listingItemType` as the stable internal domain concept. Avoid using `instrumentType` in a way that excludes bows.
+
+Deferred listing item types:
+
+```text
+double_bass
+cases
+accessories
+sheet_music
+services
+```
+
+## Price handling
+
+The MVP supports both stated asking prices and price-on-request listings.
+
+Stable internal fields:
+
+```text
+priceMode: asking_price | price_on_request
+priceAmount: number | null
+priceCurrency: EUR | USD | GBP | ...
+```
+
+Rules:
+
+- If `priceMode` is `asking_price`, `priceAmount` is required.
+- If `priceMode` is `price_on_request`, `priceAmount` is null.
+- Public UI displays price-on-request listings with localized text.
+- Numeric price filters apply only to listings with `priceMode = asking_price`.
+- Price-on-request listings are excluded from numeric price-range results unless a separate include option is later added.
+- The documentation score may recognize that a price state is provided, but should not imply that every high-value listing must publish an exact amount.
+
+## Future vision: dealer and workshop discovery while traveling
+
+The long-term platform vision includes helping musicians discover trusted dealers and workshops wherever they are traveling. This may later become a map-based experience similar to travel booking platforms, where dealers and workshops are listed geographically and shown as pins on a map.
+
+This is not part of the one-week prototype. Do not implement map UI, geolocation search, latitude/longitude fields, map pins, or appointment scheduling in the MVP. Capture this direction only in the future epic.
 
 ---
 
-## Epic 0: Internationalization as a Foundation
+## Priority guide
 
-### Story 0.1 — Provide locale-aware routing
+### Must
+
+```text
+0.1 Locale-aware routing
+0.2 Externalized UI copy
+0.3 Localized domain values
+0.4 Language switcher
+0.6 Locale-aware price and date formatting
+1.1 Lightweight seller/dealer profile
+1.2 Create listing for instrument or bow
+1.3 Add listing photos
+1.4 Capture documents and certificates
+1.5 Submit listing for review
+2.1 Documentation completeness score
+2.2 Trust panel
+2.3 Admin review list
+2.4 Review submitted listing
+2.5 Keep unpublished listings hidden
+2.6 Seller sees requested changes
+3.1 Public marketplace
+3.3 Listing detail page
+4.1 Submit buyer inquiry
+4.2 Capture buyer primary intent
+4.3 Seller sees inquiries
+4.4 Admin sees all inquiries in a simple internal view
+5.1 Seed data
+```
+
+### Should
+
+```text
+0.5 Multilingual listing text structure
+2.7 Seller resubmits after requested changes
+3.2 Filter by listing item type and price
+5.2 Demo role switcher
+```
+
+### Could
+
+```text
+6.1 Future dealer/workshop discovery notes
+```
+
+---
+
+# Epic 0: Internationalization as a Foundation
+
+## Story 0.1 - Provide locale-aware routing
 
 **As** an international user  
 **I want** to open the platform in English or German  
 **So that** I can use the marketplace in my preferred language.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Locale-aware routing
@@ -43,25 +163,24 @@ Scenario: User opens the English marketplace route
   Then I see the marketplace with English UI text
 
 Scenario: Unsupported locale is used
-  Given I open a route with an unsupported locale
+  Given I open a marketplace route with an unsupported locale
   When the route is loaded
-  Then I am redirected to the default locale
-  Or I see a clear localized error page
+  Then I am redirected to /en/marketplace
 ```
 
-#### Notes
+### Notes
 
 The MVP only needs `en` and `de`, but the implementation must not be hard-wired to exactly two locales.
 
 ---
 
-### Story 0.2 — Externalize visible UI copy
+## Story 0.2 - Externalize visible UI copy
 
 **As** a developer  
 **I want** visible UI copy to be loaded from locale files or an i18n mechanism  
 **So that** additional languages can be added without rewriting UI components.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Externalized UI copy
@@ -83,354 +202,397 @@ Scenario: New visible text is added
   And entries exist for English and German
 ```
 
-#### Notes
-
-This story is a cross-cutting rule for all other MVP stories.
-
 ---
 
-### Story 0.3 — Localize domain values
+## Story 0.3 - Localize domain values
 
 **As** a buyer  
-**I want** instrument types, document types, seller types, buyer intents, and listing statuses to be displayed in my language  
+**I want** listing item types, document types, seller types, buyer intents, and listing statuses to be displayed in my language  
 **So that** the platform remains understandable across markets.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Localized domain values
 
-Scenario: Instrument type is displayed in German
-  Given a listing has instrumentType "violin"
-  And my locale is German
-  When I open the detail page
-  Then I see "Violine"
-
-Scenario: Instrument type is displayed in English
-  Given a listing has instrumentType "violin"
+Scenario: Bow listing item type is displayed in English
+  Given a listing has listingItemType "bow"
   And my locale is English
   When I open the detail page
-  Then I see "Violin"
+  Then I see "Bow"
+
+Scenario: Bow listing item type is displayed in German
+  Given a listing has listingItemType "bow"
+  And my locale is German
+  When I open the detail page
+  Then I see "Bogen"
 
 Scenario: Internal codes remain stable
-  Given a listing has instrumentType "violin"
+  Given a listing has listingItemType "bow"
   When I switch between German and English
-  Then the stored value remains "violin"
+  Then the stored value remains "bow"
   And only the displayed label changes
 ```
 
-#### Notes
-
-Stable internal codes are more important than localized database values. UI labels should be localized at display time.
-
 ---
 
-### Story 0.4 — Provide a language switcher
+## Story 0.4 - Provide a language switcher
 
 **As** a user  
 **I want** to switch between English and German  
-**So that** I can view the same flow in another language.
+**So that** I can inspect the same listing in either MVP language.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Language switcher
 
-Scenario: User switches from German to English
-  Given I am on /de/marketplace
-  When I select English
-  Then I am taken to /en/marketplace
-  And the UI is shown in English
+Scenario: User switches from English to German
+  Given I am on /en/marketplace
+  When I choose German
+  Then I am taken to /de/marketplace
+  And the same marketplace content is shown with German UI labels
 
-Scenario: User switches language on a detail page
-  Given I am on /de/marketplace/listing-123
-  When I select English
-  Then I am taken to /en/marketplace/listing-123
-  And I see the same listing with English UI text
+Scenario: User switches language on a listing detail page
+  Given I am on an English listing detail page
+  When I choose German
+  Then I remain on the same listing detail page
+  And the route uses /de/
 ```
 
 ---
 
-### Story 0.5 — Prepare multilingual listing structure
+## Story 0.5 - Prepare multilingual listing text structure
 
-**As** a platform operator  
-**I want** listing free text to support later translations  
-**So that** instruments can become internationally discoverable and understandable.
+**As** a platform owner  
+**I want** seller-generated listing text to record its source locale  
+**So that** the platform can support translations later without corrupting original seller text.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Multilingual listing structure
+Feature: Multilingual listing text structure
 
-Scenario: Listing has a source locale
-  Given a seller creates a listing in German
-  When the listing is saved
-  Then sourceLocale is saved as "de"
+Scenario: Seller creates a listing in German
+  Given my active locale is German
+  When I create a listing with title and description
+  Then the listing stores sourceLocale "de"
+  And the original title and description are preserved
 
-Scenario: Translation is not yet available
-  Given a German listing has no English free-text translation
-  When a buyer opens the English detail page
-  Then the buyer sees English UI text
-  And structured fields and trust signals are localized in English
-  And free text may be shown in its original language with a clear note
-
-Scenario: Translation is available
-  Given a listing has an English translation for title and description
-  When a buyer opens the English detail page
-  Then the buyer sees the translated listing free text
+Scenario: Translation is not available
+  Given a listing was created in German
+  And no English translation exists
+  When I open the listing in English
+  Then I see the original seller text
+  And I see a clear indication that the seller text is shown in its original language if needed
 ```
 
-#### Notes
+### Priority
 
-The MVP does not need automatic translation of seller-generated free text. The important part is preparing the data structure.
+Should. This is architecturally important, but the demo can use seed content if time is short.
 
 ---
 
-## Epic 1: Seller/Dealer Brings an Instrument onto the Platform
-
-### Story 1.1 — Display lightweight seller profile
+## Story 0.6 - Format prices and dates by locale
 
 **As** a buyer  
-**I want** to see who is offering an instrument  
-**So that** I can assess trust in the listing.
+**I want** prices and dates to be formatted consistently for the active locale  
+**So that** listings feel credible and understandable internationally.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Display seller profile
+Feature: Locale-aware formatting
 
-Scenario: Buyer sees basic seller information
-  Given a published instrument has a seller profile
-  When I open the instrument detail page
-  Then I see the seller display name
-  And I see the seller type localized in my language
-  And I see the location
-  And I see the verification status localized in my language
+Scenario: Asking price is shown in English locale
+  Given a listing has priceMode "asking_price"
+  And priceAmount 18000
+  And priceCurrency "EUR"
+  When I open the listing in English
+  Then the listing price is displayed according to the English locale
+  And the displayed currency remains EUR
 
-Scenario: Seller is not verified in German
-  Given a seller profile is not verified
-  When I open the instrument detail page in German
-  Then I see a clear note "Noch nicht verifiziert"
+Scenario: Asking price is shown in German locale
+  Given a listing has priceMode "asking_price"
+  And priceAmount 18000
+  And priceCurrency "EUR"
+  When I open the listing in German
+  Then the listing price is displayed according to the German locale
+  And the displayed currency remains EUR
 
-Scenario: Seller is not verified in English
-  Given a seller profile is not verified
-  When I open the instrument detail page in English
-  Then I see a clear note "Not yet verified"
+Scenario: Price on request is shown in English
+  Given a listing has priceMode "price_on_request"
+  And my locale is English
+  When I open the listing detail page
+  Then I see the localized price label "Price on request"
+  And no numeric price amount is shown
+
+Scenario: Price on request is shown in German
+  Given a listing has priceMode "price_on_request"
+  And my locale is German
+  When I open the listing detail page
+  Then I see the localized price label "Preis auf Anfrage"
+  And no numeric price amount is shown
 ```
 
-#### Notes
+### Notes
 
-For the prototype, a lightweight seller profile with name, type, location, description, and verification status is enough.
+Avoid brittle tests that assert exact punctuation or spacing of formatted currency strings unless the implementation standardizes one formatting library and locale configuration.
 
 ---
 
-### Story 1.2 — Create an instrument listing
+# Epic 1: Seller/Dealer Brings a Listing onto the Platform
+
+## Story 1.1 - Show a lightweight seller/dealer profile
+
+**As** a buyer  
+**I want** to see who offers a listing  
+**So that** I can assess basic trust and context.
+
+### Acceptance criteria
+
+```gherkin
+Feature: Lightweight seller profile
+
+Scenario: Buyer sees seller information
+  Given a published listing has a seller profile
+  When I open the listing detail page
+  Then I see the seller display name
+  And I see the seller type
+  And I see the seller city and country
+  And I see the seller verification status
+
+Scenario: Seller is not verified
+  Given a seller profile is not verified
+  When I open the listing detail page
+  Then I see a clear localized unverified status
+```
+
+### Notes
+
+For the one-week prototype, keep this profile intentionally small:
+
+```text
+displayName
+sellerType
+city
+country
+verificationStatus
+description
+```
+
+Do not add map-ready fields such as latitude, longitude, dealer pins, or geolocation search in the MVP.
+
+---
+
+## Story 1.2 - Create a listing for an instrument or bow
 
 **As** a seller or dealer  
-**I want** to create an instrument listing in a structured form  
-**So that** the platform can turn it into a high-quality listing profile.
+**I want** to create a structured listing for a string instrument or bow  
+**So that** the platform can produce a high-quality listing profile.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Create instrument listing
+Feature: Create listing
 
-Scenario: Seller creates a new instrument
+Scenario: Seller creates a new bow listing
   Given I am in the seller area
-  When I enter instrument type, title, origin, year, price, and condition
-  Then the instrument is saved as a draft
+  When I create a new listing
+  And I choose listingItemType "bow"
+  And I enter title, origin, year label, price state, and condition summary
+  Then the listing is saved as a draft
   And I see it in my listing overview
-  And the source locale of the listing is saved
+  And the listing source locale is stored
+
+Scenario: Seller creates a price-on-request listing
+  Given I am in the listing form
+  When I choose priceMode "price_on_request"
+  Then priceAmount is not required
+  And the listing can be saved as a draft
 
 Scenario: Required fields are missing
-  Given I am in the instrument form
-  When I try to save without title or instrument type
-  Then I see clear validation messages in my UI language
-  And the instrument is not submitted as a complete listing
+  Given I am in the listing form
+  When I try to save without title or listing item type
+  Then I see localized validation errors
+  And the listing is not submitted for review
 ```
 
-#### Notes
+### Notes
 
-The first prototype may persist data locally, through a mock API, or in the existing database.
+The first prototype may store data locally, through a mock API, or in the existing application database.
 
 ---
 
-### Story 1.3 — Add instrument photos
+## Story 1.3 - Add listing photos
 
 **As** a seller  
-**I want** to add photos to an instrument  
-**So that** buyers can better understand condition and quality.
+**I want** to add photos to a listing  
+**So that** buyers can better assess condition and quality.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Add instrument photos
+Feature: Listing photos
 
 Scenario: Seller adds photos
-  Given an instrument exists as a draft
-  When I add multiple photo URLs or sample images
-  Then the photos are shown in the listing
+  Given a listing exists as a draft
+  When I add multiple photo URLs or demo images
+  Then the photos are shown in the listing preview
   And the photos appear on the public detail page after publication
 
-Scenario: No photos exist
+Scenario: No photos are present
   Given a listing has no photos
   When the documentation score is calculated
-  Then the absence of photos is shown as a warning signal
-  And the warning signal is localized in the UI language
+  Then missing photos are represented as a trust warning
+  And the warning is localized
 ```
 
-#### Notes
+### Notes
 
-Static sample images or seeded image URLs are acceptable for the first demo.
+Static demo images or seeded image URLs are acceptable.
 
 ---
 
-### Story 1.4 — Capture documents and certificates
+## Story 1.4 - Capture documents and certificates
 
 **As** a seller  
-**I want** to record certificates, appraisals, and provenance information  
-**So that** the instrument can be assessed with better specialist context.
+**I want** to capture certificate, appraisal, repair-history, and provenance metadata  
+**So that** the listing is easier to evaluate professionally.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Capture documents
+Feature: Listing documents
 
 Scenario: Seller records a certificate
-  Given I am editing an instrument
-  When I add a document of type "certificate" with title, issuer, and date
+  Given I edit a listing
+  When I add a document of type "certificate" with title, issuer, and issue date
   Then the document appears in the documentation overview
-  And the trust panel shows "Certificate available" in English
+  And the trust panel can show a localized certificate-present signal
 
-Scenario: Certificate is shown in German
-  Given a listing has a certificate
-  When I open the detail page in German
-  Then the trust panel shows "Zertifikat vorhanden"
-
-Scenario: Document should not be publicly visible
-  Given a document is marked as not public
-  When a buyer opens the detail page
-  Then the buyer only sees that a document exists
+Scenario: Document is not publicly visible
+  Given a document is marked as not publicly visible
+  When a buyer opens the listing detail page
+  Then the buyer sees that supporting documentation exists
   And the buyer does not see confidential document details
 ```
 
-#### Notes
+### Notes
 
 The prototype does not need to store real document files. Metadata is enough.
 
 ---
 
-### Story 1.5 — Submit listing for review
+## Story 1.5 - Submit listing for review
 
 **As** a seller  
-**I want** to submit a prepared listing for review  
+**I want** to submit a prepared listing for platform review  
 **So that** the platform can qualify it before publication.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Submit listing for review
 
 Scenario: Seller submits a listing
-  Given an instrument is saved as a draft
-  And the minimum required data exists
-  When I submit the listing
+  Given a listing is saved as a draft
+  And minimum required information is present
+  When I submit the listing for review
   Then the listing receives status "submitted"
   And it appears in the admin review list
 
-Scenario: Minimum data is missing
-  Given an instrument has no condition description
-  When I try to submit the listing
-  Then I see a warning about missing data in my UI language
+Scenario: Minimum information is missing
+  Given a listing has no condition summary
+  When I try to submit the listing for review
+  Then I see a localized warning with missing information
   And the listing remains in draft status
 ```
 
 ---
 
-## Epic 2: Platform Structures and Qualifies the Listing
+# Epic 2: Platform Structures and Qualifies the Listing
 
-### Story 2.1 — Calculate documentation score
+## Story 2.1 - Calculate documentation completeness score
 
 **As** a platform operator  
-**I want** to calculate a documentation score  
+**I want** to calculate a documentation completeness score  
 **So that** listing quality is visible at a glance.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Documentation score
+Feature: Documentation completeness score
 
 Scenario: Listing has many trust-building details
-  Given a listing has seller profile, photos, condition, certificate, and provenance information
+  Given a listing has seller profile, photos, condition summary, certificate, and provenance summary
   When the score is calculated
-  Then the listing receives a high documentation score
-  And the score is displayed on the detail page
+  Then the listing receives a high documentation completeness score
+  And the score is shown on the detail page
 
-Scenario: Listing has only limited details
-  Given a listing has only title, price, and one photo
+Scenario: Listing has limited details
+  Given a listing has only title, price state, and one photo
   When the score is calculated
-  Then the listing receives a low documentation score
-  And missing information is shown as warning signals
-  And the warning signals are localized
+  Then the listing receives a low documentation completeness score
+  And missing information is displayed as localized warnings
 ```
 
-#### Example scoring rules
+### Example scoring rules
 
 ```text
-+15 seller profile complete
-+15 certificate available
-+15 at least 5 photos available
-+15 condition description available
-+15 provenance information available
-+10 asking price stated
-+10 viewing or trial possible
-+5 repair history available
++15 seller profile present
++15 certificate metadata present
++15 at least 5 photos present
++15 condition summary present
++15 provenance summary present
++10 clear price state present
++10 viewing or trial option present
++5 repair-history metadata present
 ```
+
+### Notes
+
+The score measures documentation completeness only. It must not claim authenticity, valuation accuracy, legal verification, or expert approval.
 
 ---
 
-### Story 2.2 — Display trust panel
+## Story 2.2 - Show trust panel
 
 **As** a buyer  
 **I want** to see trust signals at a glance  
-**So that** I can better assess the listing.
+**So that** I can assess whether a listing deserves further inquiry.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Display trust panel
+Feature: Trust panel
 
 Scenario: Buyer sees trust signals in English
   Given a published listing has calculated trust signals
   And my locale is English
   When I open the detail page
-  Then I see the documentation score
-  And I see present trust signals with positive markers
+  Then I see the documentation completeness score
+  And I see present signals with positive markers
   And I see missing or partial signals as warnings
 
 Scenario: Buyer sees trust signals in German
   Given a published listing has calculated trust signals
   And my locale is German
   When I open the detail page
-  Then I see the documentation score
-  And I see present trust signals with positive markers
-  And I see missing or partial signals as warnings
-
-Scenario: Provenance is only partially documented
-  Given a listing has a short provenance note but no supporting document
-  When I open the detail page
-  Then I see localized text for "Provenance partially documented"
+  Then I see the documentation completeness score
+  And I see present signals with localized labels
+  And I see missing or partial signals with localized labels
 ```
 
 ---
 
-### Story 2.3 — Display admin review list
+## Story 2.3 - Show admin review list
 
 **As** a platform operator  
 **I want** to review submitted listings  
-**So that** not every listing is published without qualification.
+**So that** listings are not published without platform qualification.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Admin review list
@@ -439,27 +601,27 @@ Scenario: Admin sees submitted listings
   Given there are listings with status "submitted"
   When I open the admin review page
   Then I see a list of submitted listings
-  And I see title, seller, instrument type, score, and submission date
-  And status values and instrument types are displayed in my UI language
+  And I see title, seller, listing item type, score, and submission date
+  And statuses and listing item types are localized
 
-Scenario: No listings have been submitted
+Scenario: No listings are submitted
   Given there are no submitted listings
   When I open the admin review page
-  Then I see an empty state with a clear localized explanation
+  Then I see a localized empty-state explanation
 ```
 
 ---
 
-### Story 2.4 — Publish reviewed listing
+## Story 2.4 - Review submitted listing
 
 **As** an admin  
-**I want** to publish a reviewed listing  
-**So that** buyers can see it in the marketplace.
+**I want** to publish a reviewed listing or request changes  
+**So that** only sufficiently prepared listings appear publicly.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Publish listing
+Feature: Review submitted listing
 
 Scenario: Admin publishes a listing
   Given a listing has status "submitted"
@@ -467,39 +629,122 @@ Scenario: Admin publishes a listing
   Then the listing receives status "published"
   And it appears in the public marketplace
 
-Scenario: Listing remains unpublished
-  Given a listing has status "draft" or "submitted"
-  When a buyer opens the marketplace
-  Then the buyer does not see that listing in the public catalogue
+Scenario: Admin requests changes
+  Given a listing has status "submitted"
+  When I request changes with a review note
+  Then the listing receives status "changes_requested"
+  And the review note is stored
 ```
 
 ---
 
-## Epic 3: Buyer Finds Instruments and Understands Trust
+## Story 2.5 - Keep unpublished listings hidden
 
-### Story 3.1 — Display public marketplace
+**As** a platform operator  
+**I want** draft, submitted, and changes-requested listings to remain hidden from public buyers  
+**So that** buyers only see listings that have passed the platform review step.
 
-**As** a buyer  
-**I want** to browse published instruments  
-**So that** I can discover relevant offers.
-
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Display marketplace
+Feature: Public visibility rules
 
-Scenario: Buyer sees published instruments in English
+Scenario: Draft listing is hidden
+  Given a listing has status "draft"
+  When a buyer opens the marketplace
+  Then the listing is not shown
+
+Scenario: Submitted listing is hidden
+  Given a listing has status "submitted"
+  When a buyer opens the marketplace
+  Then the listing is not shown
+
+Scenario: Changes-requested listing is hidden
+  Given a listing has status "changes_requested"
+  When a buyer opens the marketplace
+  Then the listing is not shown
+```
+
+---
+
+## Story 2.6 - Seller sees requested changes
+
+**As** a seller  
+**I want** to see why my submitted listing needs changes  
+**So that** I understand what must be improved before publication.
+
+### Acceptance criteria
+
+```gherkin
+Feature: Seller sees requested changes
+
+Scenario: Seller sees change request status
+  Given my listing has status "changes_requested"
+  When I open my seller listing dashboard
+  Then I see that changes are required
+  And I see the admin review note or requested-change summary
+
+Scenario: Changes-requested listing is not public
+  Given my listing has status "changes_requested"
+  When a buyer opens the marketplace
+  Then the listing is not shown
+```
+
+### Notes
+
+This is Must because the review loop depends on it. Full resubmission UX can remain lightweight or be handled by Story 2.7.
+
+---
+
+## Story 2.7 - Seller resubmits after requested changes
+
+**As** a seller  
+**I want** to update and resubmit a listing after changes are requested  
+**So that** the admin can review it again.
+
+### Acceptance criteria
+
+```gherkin
+Feature: Resubmit listing after requested changes
+
+Scenario: Seller resubmits listing
+  Given my listing has status "changes_requested"
+  When I update the requested information and resubmit
+  Then the listing receives status "submitted"
+  And it appears in the admin review list again
+```
+
+### Priority
+
+Should. This can be simplified during the prototype if the demo only needs to show the requested-changes state.
+
+---
+
+# Epic 3: Buyer Finds Listings and Builds Trust
+
+## Story 3.1 - Show public marketplace
+
+**As** a buyer  
+**I want** to browse published listings  
+**So that** I can discover relevant instruments and bows.
+
+### Acceptance criteria
+
+```gherkin
+Feature: Public marketplace
+
+Scenario: Buyer sees published listings in English
   Given there are published listings
   When I open /en/marketplace
-  Then I see cards with title, instrument type, price, location, and photo
-  And I see the documentation score or trust status
+  Then I see listing cards with title, listing item type, price state, location, and photo
+  And I see documentation score or trust status
   And UI labels are English
 
-Scenario: Buyer sees published instruments in German
+Scenario: Buyer sees published listings in German
   Given there are published listings
   When I open /de/marketplace
-  Then I see cards with title, instrument type, price, location, and photo
-  And I see the documentation score or trust status
+  Then I see listing cards with localized labels
+  And I see documentation score or trust status
   And UI labels are German
 
 Scenario: Unpublished listings are hidden
@@ -510,89 +755,84 @@ Scenario: Unpublished listings are hidden
 
 ---
 
-### Story 3.2 — Filter by instrument type and price
+## Story 3.2 - Filter by listing item type and price
 
 **As** a buyer  
-**I want** to filter instruments by type and price  
-**So that** I can find relevant listings faster.
+**I want** to filter listings by item type and numeric price range  
+**So that** I can find relevant published listings faster.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Marketplace filters
 
-Scenario: Buyer filters by instrument type in English
-  Given published listings include violins and cellos
-  When I select the filter "Violin"
-  Then I only see violins
+Scenario: Buyer filters by listing item type
+  Given published listings include violins, cellos, and bows
+  When I select listing item type "bow"
+  Then I only see bow listings
 
-Scenario: Buyer filters by instrument type in German
-  Given published listings include violins and cellos
-  When I select the filter "Violine"
-  Then I only see violins
+Scenario: Buyer filters by numeric price range
+  Given published listings include asking-price listings with different prices
+  When I select a numeric price range
+  Then I only see asking-price listings within that range
 
-Scenario: Buyer filters by price range
-  Given published listings have different prices
-  When I select a price range
-  Then I only see listings within that range
+Scenario: Price-on-request listing is excluded from numeric price filter
+  Given a published listing has priceMode "price_on_request"
+  When I apply a numeric price range filter
+  Then the price-on-request listing is not included in the numeric filter results
 ```
 
-#### Notes
+### Priority
 
-Simple client-side or server-side filters are enough for the prototype. Internal filter values should remain stable codes.
+Should. The marketplace can be demoed without filters if time is short.
 
 ---
 
-### Story 3.3 — Display instrument detail page
+## Story 3.3 - Show listing detail page
 
 **As** a buyer  
-**I want** to open a detailed page for an instrument  
-**So that** I can review offer details, condition, origin, and trust signals.
+**I want** to open a detailed page for a listing  
+**So that** I can review item details, condition, origin, seller context, and trust signals.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Instrument detail page
+Feature: Listing detail page
 
-Scenario: Buyer opens an instrument
+Scenario: Buyer opens a published listing
   Given a listing is published
   When I open the detail page
-  Then I see title, instrument type, price, origin, year, and condition description
+  Then I see title, listing item type, price state, origin, year label, and condition summary
   And I see photos
   And I see seller information
   And I see the trust panel
-  And I see a way to submit an inquiry
-
-Scenario: Buyer switches language on detail page
-  Given I view a listing in German
-  When I switch to English
-  Then I remain on the same listing detail page
-  And UI text, trust signals, and domain labels are displayed in English
+  And I see an option to submit an inquiry
 ```
 
 ---
 
-## Epic 4: Buyer Submits a Qualified Inquiry
+# Epic 4: Buyer Submits a Qualified Inquiry
 
-### Story 4.1 — Submit buyer inquiry
+## Story 4.1 - Submit buyer inquiry
 
 **As** a buyer  
-**I want** to submit a qualified inquiry for an instrument  
-**So that** the seller or platform operator can understand my level of interest.
+**I want** to submit a qualified inquiry about a listing  
+**So that** the seller and platform operator can understand my interest.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Submit buyer inquiry
+Feature: Buyer inquiry
 
-Scenario: Buyer sends complete inquiry
-  Given I am on an instrument detail page
+Scenario: Buyer submits complete inquiry
+  Given I am on a published listing detail page
   When I enter name, email, buyer type, intent, budget range, and message
+  And I confirm that my inquiry details may be shared with the responsible seller
   And I submit the inquiry
   Then the inquiry is saved
-  And I see a confirmation in my UI language
-  And the inquiry appears in the seller or admin dashboard
-  And the preferred language of the inquiry is saved
+  And I see a localized confirmation
+  And the inquiry appears in the seller inquiry view
+  And the inquiry appears in a simple admin inquiry view
 
 Scenario: Required fields are missing
   Given I am in the inquiry form
@@ -601,175 +841,254 @@ Scenario: Required fields are missing
   And the inquiry is not saved
 ```
 
+### Notes
+
+Admin visibility can be a simple internal list/detail view. It does not need to be a polished analytics dashboard in week one.
+
 ---
 
-### Story 4.2 — Capture buyer intent
+## Story 4.2 - Capture buyer primary intent
 
 **As** a seller  
-**I want** to know what the buyer specifically wants  
+**I want** to know the buyer's primary reason for contacting me  
 **So that** I can prioritize and respond appropriately.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Capture buyer intent
+Feature: Buyer primary intent
 
-Scenario: Buyer selects interest in English
+Scenario: Buyer selects one required primary intent
   Given I submit an inquiry
-  When I select "Trial" as my interest
-  Then the internal intent code is saved
-  And the seller dashboard can display it localized
+  When I choose "trial" as my primary intent
+  Then the primary intent is stored with the inquiry
+  And the intent label is localized in seller and admin inquiry views
 
-Scenario: Buyer selects interest in German
-  Given I submit an inquiry in German
-  When I select "Probespiel" as my interest
-  Then the internal intent code is saved
-  And the seller dashboard can display it localized
-
-Scenario: Buyer has multiple interests
-  Given I submit an inquiry
-  When I select "Viewing" and "Certificate question"
-  Then both intents are displayed in the inquiry overview
+Scenario: Buyer submits without an intent
+  Given I am in the inquiry form
+  When I submit without choosing an intent
+  Then I see a localized validation error
+  And the inquiry is not saved
 ```
+
+### Notes
+
+Multi-intent inquiry support is deferred. The one-week prototype stores one required primary intent.
 
 ---
 
-### Story 4.3 — Seller sees inquiries
+## Story 4.3 - Seller sees inquiries
 
 **As** a seller  
-**I want** to see inquiries for my instruments  
-**So that** I can continue working with qualified prospects.
+**I want** to see inquiries for my listings  
+**So that** I can follow up with qualified interested buyers.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
-Feature: Seller sees inquiries
+Feature: Seller inquiry view
 
-Scenario: Seller opens inquiry dashboard
+Scenario: Seller opens inquiry view
   Given there are inquiries for my listings
-  When I open my inquiry dashboard
-  Then I see buyer name, instrument, intent, budget range, message, and status
-  And I see the buyer's preferred language
+  When I open my seller inquiry view
+  Then I see buyer name, listing title, intent, budget range, message, and status
 
 Scenario: Inquiry is new
-  Given an inquiry has just been created
-  When I open the dashboard
+  Given an inquiry was just created
+  When I open the seller inquiry view
   Then the inquiry has status "new"
 ```
 
 ---
 
-## Epic 5: Demo and Seed Data
+## Story 4.4 - Admin sees all inquiries in a simple internal view
 
-### Story 5.1 — Provide seed data for example instruments
+**As** an admin  
+**I want** to see all buyer inquiries in a simple internal view  
+**So that** the platform can understand lead quality and support the marketplace flow.
+
+### Acceptance criteria
+
+```gherkin
+Feature: Admin inquiry view
+
+Scenario: Admin sees all inquiries
+  Given buyer inquiries exist across multiple listings
+  When I open the admin inquiry view
+  Then I see all inquiries
+  And I see buyer name, listing title, seller, intent, budget range, message, and status
+
+Scenario: No inquiries exist
+  Given no buyer inquiries exist
+  When I open the admin inquiry view
+  Then I see a localized empty-state explanation
+```
+
+### Notes
+
+This is Must because Story 4.1 requires admin visibility. Keep it simple; a table or card list is enough.
+
+---
+
+# Epic 5: Demo and Seed Data
+
+## Story 5.1 - Provide seed data for the full trust flow
 
 **As** a demo presenter  
-**I want** realistic example instruments  
-**So that** the prototype can be presented convincingly.
+**I want** realistic seed listings across the listing lifecycle  
+**So that** the prototype can demonstrate seller creation, platform review, publication, and buyer inquiry.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Seed data
 
-Scenario: Demo data is loaded
-  Given the application starts locally
-  When I open the marketplace
-  Then I see at least 8 example instruments
-  And the instruments have different types, prices, origins, and trust scores
+Scenario: Demo data supports the full trust flow
+  Given the application is started locally
+  When demo data is loaded
+  Then there are sample listings for violins, violas, cellos, and bows
+  And at least one listing has status "draft"
+  And at least one listing has status "submitted"
+  And at least one listing has status "changes_requested"
+  And several listings have status "published"
 
-Scenario: Example instrument has strong documentation
-  Given a seed listing is marked as well documented
+Scenario: Public marketplace shows only published seed listings
+  Given demo data includes listings in multiple statuses
+  When I open the marketplace
+  Then I only see listings with status "published"
+
+Scenario: Sample listing has strong documentation
+  Given a published seed listing is marked as strongly documented
   When I open its detail page
   Then I see multiple positive trust signals
-  And the documentation score is high
+  And the documentation completeness score is high
 
-Scenario: Seed data supports English and German
-  Given the demo data is loaded
+Scenario: Seed data supports English and German UI
+  Given demo data includes listings in multiple statuses
   When I switch between English and German
   Then the same listings remain available
-  And structured labels and trust signals are localized
+  And structured labels, statuses, item types, price states, and trust signals are localized
 ```
 
-#### Example instruments
+### Example seed listings
 
 ```text
-1. German violin, ca. 1890, €18,000, certificate available
-2. Modern Viennese master violin, 2021, €24,000, verified workshop profile
-3. French cello bow, ca. 1930, €9,500, provenance partially documented
-4. Viola from Mittenwald, ca. 1920, €14,000, repair history available
-5. Higher-quality student violin, €3,800, limited documentation
-6. Violin attributed to an Italian maker, ca. 1880, price on request, appraisal pending
-7. Modern cello, 2018, €21,000, trial possible
-8. Baroque bow replica, €2,400, workshop documentation available
+1. German violin, circa 1890, asking price EUR 18,000, certificate metadata present, status published
+2. Modern Viennese master violin, 2021, asking price EUR 24,000, reviewed workshop profile, status published
+3. French cello bow, circa 1930, asking price EUR 9,500, provenance partially documented, status submitted
+4. Viola from Mittenwald, circa 1920, asking price EUR 14,000, repair-history metadata present, status published
+5. High-quality student violin, asking price EUR 3,800, limited documentation, status draft
+6. Violin attributed to an Italian maker, circa 1880, price on request, appraisal pending, status changes_requested
+7. Modern cello, 2018, asking price EUR 21,000, trial available, status published
+8. Baroque bow replica, asking price EUR 2,400, workshop documentation present, status published
 ```
+
+### Notes
+
+Seed data must support the seller/admin qualification loop first, not only the public buyer marketplace. Public marketplace views must filter out unpublished listings.
 
 ---
 
-### Story 5.2 — Provide demo role switcher
+## Story 5.2 - Provide demo role switcher
 
 **As** a demo presenter  
 **I want** to switch quickly between buyer, seller, and admin views  
 **So that** I can show the value stream without login friction.
 
-#### Acceptance criteria
+### Acceptance criteria
 
 ```gherkin
 Feature: Demo role switcher
 
-Scenario: Demo user switches role to Seller
+Scenario: Demo user switches to seller
   Given I am using the prototype
-  When I select role "Seller"
+  When I choose the role "Seller"
   Then I see seller functions
 
-Scenario: Demo user switches role to Admin
+Scenario: Demo user switches to admin
   Given I am using the prototype
-  When I select role "Admin"
+  When I choose the role "Admin"
   Then I see review functions
-
-Scenario: Role and language are independent
-  Given I use the platform in English
-  When I switch to role "Admin"
-  Then I remain in the English UI
 ```
 
-#### Notes
+### Notes
 
-If real authentication already works well in the base app, this story can be skipped or replaced later.
+If real auth in the base app is already stable and fast to use, this story can be skipped.
 
 ---
 
-## Recommended Implementation Order
+# Epic 6: Future Dealer and Workshop Discovery
+
+## Story 6.1 - Capture future dealer/workshop discovery notes
+
+**As** a platform strategist  
+**I want** to document the future dealer and workshop discovery value stream  
+**So that** the MVP does not accidentally overbuild it while still preserving the larger vision.
+
+### Future value stream
 
 ```text
-1. Locale routing, locale files, and language switcher
-2. Seed data and domain models with stable codes
-3. Public marketplace in English and German
-4. Instrument detail page with localized trust panel
-5. Inquiry form and inquiry dashboard including preferred language
-6. Seller wizard for instruments including sourceLocale
-7. Admin review and status changes
-8. Filters and UI polish
-9. Demo role switcher if needed
+Traveling musician searches by city or current location
+-> Platform shows trusted dealers and workshops nearby
+-> Musician filters by specialties, languages, and current inventory
+-> Musician opens dealer/workshop profile
+-> Musician requests appointment or makes an inquiry
+```
+
+### Future capabilities
+
+```text
+dealer/workshop map pins
+geolocation search
+search by travel destination
+specialties: violins, violas, cellos, bows, restoration, appraisals
+languages spoken
+appointment availability
+nearby listings
+verified dealer/workshop badges
+```
+
+### MVP boundary
+
+None of these capabilities are part of the one-week prototype. The MVP may show seller city and country only. Do not implement map UI, geolocation search, latitude/longitude fields, map pins, or appointment scheduling.
+
+---
+
+## Recommended implementation order
+
+```text
+1. Locale routing and translation mechanism
+2. Domain types, price model, and lifecycle-aware seed data
+3. Seller create-listing flow
+4. Seller submit for review
+5. Admin review with publish and request-changes states
+6. Seller requested-changes visibility
+7. Public marketplace
+8. Listing detail page with trust panel
+9. Buyer inquiry form
+10. Seller and admin inquiry views
+11. Filter and UI polish if time allows
+12. Demo role switcher if needed
 ```
 
 ## Non-goals for this MVP
 
 ```text
-- No real payment processing
-- No escrow
-- No real document verification
-- No automatic price appraisal
-- No auctions
-- No shipping or insurance logic
-- No legally binding purchase flow
-- No automatic translation of all seller-generated free text
-- No production-grade translation management system
-- No full support for more than English and German
+real payment
+escrow
+real document verification
+automatic price valuation
+auctions
+shipping or insurance logic
+legally binding purchase workflow
+map UI
+geolocation search
+dealer map pins
+appointment scheduling
 ```
 
 ## Demo success criterion
 
-The prototype is successful if viewers understand within 10 minutes:
+The prototype is successful if viewers understand this within ten minutes:
 
-> This platform is not Facebook Marketplace for violins. It makes high-value instruments easier to trade by adding structured documentation, trust signals, internationalization, and qualified buyer inquiries.
+> This platform is not Facebook Marketplace for violins. It makes high-value string instruments and bows easier to sell and evaluate by structuring listings, qualifying them before publication, presenting localized trust signals, and capturing qualified buyer inquiries.
